@@ -159,6 +159,8 @@ git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 tmux attach    # Then press Ctrl+Space, Shift+I
 ```
 
+> Tip: edit [tmux.conf](./wsl/.config/tmux/tmux.conf) to change disk in status bar
+
 ## Configuration
 
 ### File Structure
