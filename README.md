@@ -180,10 +180,21 @@ tmux attach    # Then press Ctrl+Space, Shift+I
 
 ### Key Bindings
 
+#### Tmux
+
+| Binding        | Action                         |
+| -------------- | ------------------------------ |
+| `Ctrl + Space` | Tmux prefix                    |
+| `Prefix + I`   | Install Tmux plugins           |
+| `Prefix + c`   | Create new window              |
+| `Prefix + %`   | Create new window vertically   |
+| `Prefix + "`   | Create new window horizontally |
+| `Prefix + x`   | Kill current pane              |
+
+#### WezTerm
+
 | Binding            | Action                  |
 | ------------------ | ----------------------- |
-| `Ctrl + Space`     | Tmux prefix             |
-| `Prefix + I`       | Install Tmux plugins    |
 | `Ctrl + Shift + Q` | Close WezTerm window    |
 | `Ctrl + Shift + M` | Minimize WezTerm window |
 
