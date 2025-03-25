@@ -206,10 +206,11 @@ tmux # Then press Ctrl+Space, Shift+I
 
 #### WezTerm
 
-| Binding            | Action                  |
-| ------------------ | ----------------------- |
-| `Ctrl + Shift + Q` | Close WezTerm window    |
-| `Ctrl + Shift + M` | Minimize WezTerm window |
+| Binding                            | Action                  |
+| ---------------------------------- | ----------------------- |
+| `Ctrl + Shift + Q`                 | Close WezTerm window    |
+| `Ctrl + Shift + M`                 | Minimize WezTerm window |
+| `Ctrl + Shift + Left Mouse Button` | Drag to move mode       |
 
 > Tip: use `fish_add_path /some/path/bin` to add directories to $PATH. See: https://fishshell.com/docs/current/cmds/fish_add_path.html
 

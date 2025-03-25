@@ -47,5 +47,14 @@ return {
 			mods = "CTRL",
 			action = wezterm.action.CloseCurrentTab { confirm = false },
 		},
+	},
+
+	-- Drag window
+	mouse_bindings = {
+		{
+			event = { Drag = { streak = 1, button = 'Left' } },
+			mods = 'CTRL',
+			action = wezterm.action.StartWindowDrag,
+		},
 	}
 }
