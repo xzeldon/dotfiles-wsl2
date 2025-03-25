@@ -187,6 +187,8 @@ tmux attach    # Then press Ctrl+Space, Shift+I
 | `Ctrl + Shift + Q` | Close WezTerm window    |
 | `Ctrl + Shift + M` | Minimize WezTerm window |
 
+> Tip: use `fish_add_path /some/path/bin` to add directories to $PATH. See: https://fishshell.com/docs/current/cmds/fish_add_path.html
+
 ## License
 
 [![CC BY-NC-SA 4.0][cc-by-nc-sa-image]][cc-by-nc-sa]
