@@ -21,6 +21,8 @@ if status is-interactive
 end
 
 # Configure ssh-agent for WSL, see: https://github.com/mame/wsl2-ssh-agent
-set -x SSH_AUTH_SOCK /home/user/.ssh/wsl2-ssh-agent.sock
+if status is-login
+  /usr/sbin/wsl2-ssh-agent | source
+end
 
 starship init fish | source
