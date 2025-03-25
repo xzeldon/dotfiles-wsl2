@@ -1,6 +1,6 @@
 # WSL2 Arch Linux Development Environment
 
-My Arch Linux development environment optimized for WSL2, designed for daily workflow. This setup combines essential tools and configurations to create a powerful yet minimalist development workspace, making it perfect for both casual coding sessions and intensive development work.
+My minimal setup for Arch Linux development environment optimized for WSL2, designed for daily workflow. This setup combines essential tools and configurations to create a powerful yet minimalist development workspace.
 
 ###### Mirror on my [<img src="https://git.zeldon.ru/assets/img/logo.svg" align="center" width="25" height="25"/> Git](https://git.zeldon.ru/zeldon/dotfiles-wsl2)
 
@@ -36,6 +36,11 @@ My Arch Linux development environment optimized for WSL2, designed for daily wor
 
 > Note: WSL2 is configured to use up to 16GB of RAM in this setup (can be adjusted in [.wslconfig](./windows/.wslconfig))
 
+> Note: Throughout this guide, we'll use:
+>
+> - Distribution name: `Arch` (if you choose a different name, update it in WezTerm config under `default_domain = "WSL:Arch"`)
+> - Username: `user` (if you want a different username, update relevant configs like `./wsl/etc/wsl.conf`)
+
 ### 1. Windows Host Setup
 
 ```powershell
@@ -46,7 +51,7 @@ winget install wezterm
 git clone https://github.com/xzeldon/dotfiles-wsl2
 cd dotfiles-wsl2
 
-# Copy Windows configs
+# Copy Windows configs (THIS OVERWRITE IF FILES EXISTS!)
 Copy-Item -Path ".\windows\*" -Destination $HOME -Force -Recurse
 ```
 
@@ -85,8 +90,8 @@ wsl --import Arch D:\wsl\Arch "D:\Downloads\archlinux-latest.wsl"
 pacman -Syu
 
 # Install dependencies
-pacman -S sudo git vim neovim wget binutils less debugedit fakeroot \
-          fastfetch starship exa fish tmux htop python
+pacman -S sudo git vim neovim openssh wget binutils less debugedit fakeroot \
+          fastfetch starship exa fish tmux htop python base-devel go
 ```
 
 </details>
@@ -113,7 +118,7 @@ echo "user ALL=(ALL) ALL" >> /etc/sudoers.d/user
 # Configure WSL default user
 # 1. Copy WSL configuration file from host to guest
 # (From Windows PowerShell, assuming you're in the repo directory and Arch is a WSL distribution name, from 2.2)
-cp .\wsl\etc\wsl.conf \\wsl$\Arch\etc\wsl.conf
+cp .\wsl\etc\wsl.conf \\wsl.localhost\Arch\etc\wsl.conf
 
 # 2. Restart WSL for changes to take effect
 # (Run this in PowerShell on Windows)
@@ -123,7 +128,7 @@ wsl --shutdown
 </details>
 
 <details>
-<summary><b>Development Tools</b></summary>
+<summary><b>Aur helper and ssh bridge</b></summary>
 
 ```bash
 # Install AUR helper
@@ -134,30 +139,38 @@ makepkg -si
 # Install agent for ssh bridge (see: https://wiki.archlinux.org/title/Install_Arch_Linux_on_WSL#Bridge_the_ssh-agent_service_from_Windows)
 paru -S wsl2-ssh-agent
 
+# Create .ssh directory (this not exists by default, but required for wsl2-ssh-agent)
+mkdir ~/.ssh
 ```
-
-### Copy Configuration Files
-
-You need to copy all configuration files from the repository to your WSL environment:
-
-1. From Windows PowerShell:
-
-   ```powershell
-   # Assuming you're in the repo directory and Arch is a WSL distribution name, from 2.2
-   cp -r .\wsl\* \\wsl$\Arch\home\user\
-   ```
 
 </details>
 
-### 4. Final Setup
+<details>
+<summary><b>Copy Configuration Files</b></summary>
+
+You need to copy all configuration files from the repository to your WSL environment:
+
+From powershell:
+
+```powershell
+# Assuming you're in the repo directory, `Arch` is a WSL distribution name (from 2.2) and arch username is `user`
+Copy-Item -Path .\wsl\* -Destination \\wsl.localhost\Arch\home\user -Recurse -Force -Exclude "etc"
+```
+
+   </details>
+
+<details>
+<summary><b>Tmux configuration</b></summary>
 
 ```bash
 # Install Tmux Plugin Manager
 git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 
 # Start tmux and install plugins
-tmux attach    # Then press Ctrl+Space, Shift+I
+tmux # Then press Ctrl+Space, Shift+I
 ```
+
+</details>
 
 > Tip: edit [tmux.conf](./wsl/.config/tmux/tmux.conf) to change disk in status bar
 

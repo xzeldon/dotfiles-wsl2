@@ -38,7 +38,7 @@ return {
 	window_close_confirmation = "NeverPrompt",
 
 	-- Startup program
-	default_domain = "WSL:arch",
+	default_domain = "WSL:Arch",
 
 	-- Remap keys
 	keys = {
