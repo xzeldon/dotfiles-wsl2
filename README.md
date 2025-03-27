@@ -216,14 +216,14 @@ If you prefer a manual setup or need more control over the installation process,
 
 #### Tmux
 
-| Binding        | Action                         |
-| -------------- | ------------------------------ |
-| `Ctrl + Space` | Tmux prefix                    |
-| `Prefix + I`   | Install Tmux plugins           |
-| `Prefix + c`   | Create new window              |
-| `Prefix + %`   | Create new window vertically   |
-| `Prefix + "`   | Create new window horizontally |
-| `Prefix + x`   | Kill current pane              |
+| Binding        | Action                       |
+| -------------- | ---------------------------- |
+| `Ctrl + Space` | Tmux prefix                  |
+| `Prefix + I`   | Install Tmux plugins         |
+| `Prefix + c`   | Create new pane              |
+| `Prefix + %`   | Create new pane vertically   |
+| `Prefix + "`   | Create new pane horizontally |
+| `Prefix + x`   | Kill current pane            |
 
 #### WezTerm
 
