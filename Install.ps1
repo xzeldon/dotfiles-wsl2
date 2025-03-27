@@ -108,20 +108,24 @@ if (Test-Path $tempConfigDir) {
 }
 New-Item -Path $tempConfigDir -ItemType Directory -Force | Out-Null
 
-# Process and copy WezTerm config if it exists
+# Process and copy WezTerm config to Windows home directory only (not WSL)
 $weztermSourcePath = "$RepoPath\windows\.wezterm.lua"
 if (Test-Path $weztermSourcePath) {
-    $weztermDestPath = Join-Path $tempConfigDir ".wezterm.lua"
+    $weztermTempPath = Join-Path $env:TEMP ".wezterm.lua.temp"
     $weztermReplacements = @{
         'default_domain = "WSL:Arch"' = "default_domain = `"WSL:$DistroName`""
     }
-    Update-ConfigFile -SourcePath $weztermSourcePath -DestinationPath $weztermDestPath -Replacements $weztermReplacements
-    Copy-Item -Path $weztermDestPath -Destination "$HOME\.wezterm.lua" -Force
+    Update-ConfigFile -SourcePath $weztermSourcePath -DestinationPath $weztermTempPath -Replacements $weztermReplacements
+    Copy-Item -Path $weztermTempPath -Destination "$HOME\.wezterm.lua" -Force
+    Remove-Item -Path $weztermTempPath -Force
+    Write-Host "Updated WezTerm configuration in Windows home directory" -ForegroundColor Green
 }
 
-# Process and copy all other configuration files from the repository to WSL
-# First copy to temp directory with replacements
-Get-ChildItem -Path "$RepoPath\wsl" -Exclude "etc" -Recurse -File | ForEach-Object {
+# Process and copy all WSL configuration files to temp directory
+Get-ChildItem -Path "$RepoPath\wsl" -Recurse -File | Where-Object { 
+    # Exclude etc directory at any level and Windows-specific files
+    $_.FullName -notmatch "\\etc\\" -and $_.Name -ne ".wezterm.lua" 
+} | ForEach-Object {
     $relativePath = $_.FullName.Substring("$RepoPath\wsl".Length)
     $destPath = Join-Path $tempConfigDir $relativePath
     $destDir = Split-Path -Parent $destPath

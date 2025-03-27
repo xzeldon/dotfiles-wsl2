@@ -88,6 +88,7 @@ The repository includes an automated setup script that performs all the configur
 
 #### ⚠️ Important Notes About Automatic Setup
 
+- **Configuration Overwriting**: The script will overwrite the WezTerm configuration file in your Windows home directory. If you have a custom WezTerm setup, make sure to back it up before running the script.
 - **Error Handling**: The script does not comprehensively handle all possible errors. If something goes wrong (e.g., incorrect password confirmation, package installation failures), the script will continue execution regardless.
 - **Network Requirements**: A stable internet connection is required. Using VPNs or proxies is not recommended due to WSL networking limitations.
 - **User Interaction**: You will need to enter passwords for the root and user accounts during script execution.
