@@ -178,5 +178,5 @@ wsl --shutdown
 Write-Host "===== Setup Complete! =====" -ForegroundColor Cyan
 Write-Host "You can now launch your WSL instance with: wsl -d $DistroName" -ForegroundColor Green
 Write-Host "Remember to install Tmux plugins by pressing Ctrl+Space, Shift+I when in Tmux" -ForegroundColor Green
-Write-Host "Edit tmux.conf (~/.config/tmux/tmux.conf) to specify which disk will be displayed in the status bar."
-Write-Host "The recommended way to use this WSL setup is through WezTerm. After all configurations are complete, launch WezTerm and you should see tmux running with 3 panes automatically."
+Write-Host "Edit tmux.conf (~/.config/tmux/tmux.conf) to specify which disk will be displayed in the status bar." -ForegroundColor Green
+Write-Host "The recommended way to use this WSL setup is through WezTerm. After all configurations are complete, launch WezTerm and you should see tmux running with 3 panes automatically." -ForegroundColor Green

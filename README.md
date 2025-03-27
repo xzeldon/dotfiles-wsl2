@@ -29,7 +29,7 @@ My minimal setup for Arch Linux development environment optimized for WSL2, desi
 ### Software Requirements
 
 - Windows 10 version 2004 (build 19041) or higher / Windows 11
-- Windows Subsystem for Linux (WSL2) component enabled
+- Windows Subsystem for Linux (WSL2) component enabled _*(WSL1 is **not** supported)*_
 - Virtual Machine Platform feature enabled
 - Windows Terminal (optional but recommended for initial setup)
 - Git for Windows
