@@ -1,8 +1,8 @@
 param (
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$false)]
     [string]$DistroName = "Arch",
     
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory=$false)]
     [string]$Username = "user"
 )
 
@@ -11,7 +11,7 @@ Write-Host "Distribution: $DistroName" -ForegroundColor Yellow
 Write-Host "Username: $Username" -ForegroundColor Yellow
 Write-Host ""
 
-# Check if the specified distro exists - improved detection
+# Check if the specified distro exists
 $wslDistros = (wsl --list) -replace "`0", "" | ForEach-Object { $_.Trim() }
 $distroExists = $false
 foreach ($line in $wslDistros) {
@@ -28,6 +28,29 @@ if (-not $distroExists) {
 
 # Path to current repository
 $RepoPath = Get-Location
+
+# Function to replace placeholder values in configuration files
+function Update-ConfigFile {
+    param (
+        [string]$SourcePath,
+        [string]$DestinationPath,
+        [hashtable]$Replacements
+    )
+    
+    if (-not (Test-Path $SourcePath)) {
+        Write-Warning "Source file not found: $SourcePath"
+        return
+    }
+    
+    $content = Get-Content -Path $SourcePath -Raw
+    
+    foreach ($key in $Replacements.Keys) {
+        $content = $content -replace $key, $Replacements[$key]
+    }
+    
+    Set-Content -Path $DestinationPath -Value $content -Force
+    Write-Host "Updated configuration in: $DestinationPath" -ForegroundColor Green
+}
 
 Write-Host "Step 1: Initial Setup..." -ForegroundColor Green
 wsl -d $DistroName -u root bash -c "/usr/lib/wsl/first-setup.sh"
@@ -58,7 +81,12 @@ wsl -d $DistroName -u root bash -c "echo '$Username ALL=(ALL) ALL' > /etc/sudoer
 
 # Configure WSL default user
 Write-Host "Configuring WSL default user..." -ForegroundColor Yellow
-Copy-Item -Path "$RepoPath\wsl\etc\wsl.conf" -Destination "\\wsl$\$DistroName\etc\wsl.conf" -Force
+$wslConfReplacements = @{
+    "default=user" = "default=$Username"
+}
+$tempWslConf = Join-Path $env:TEMP "wsl.conf"
+Update-ConfigFile -SourcePath "$RepoPath\wsl\etc\wsl.conf" -DestinationPath $tempWslConf -Replacements $wslConfReplacements
+Copy-Item -Path $tempWslConf -Destination "\\wsl$\$DistroName\etc\wsl.conf" -Force
 wsl -d $DistroName -u root bash -c "dos2unix /etc/wsl.conf"
 
 Write-Host "Step 3: AUR helper and SSH bridge setup..." -ForegroundColor Green
@@ -71,9 +99,61 @@ wsl -d $DistroName -u $Username bash -c "paru -S --noconfirm wsl2-ssh-agent"
 # Create .ssh directory
 wsl -d $DistroName -u $Username bash -c "mkdir -p ~/.ssh"
 
-Write-Host "Step 4: Copying configuration files..." -ForegroundColor Green
-# Copy all configuration files from the repository to WSL
-Get-ChildItem -Path "$RepoPath\wsl" -Exclude "etc" | ForEach-Object {
+Write-Host "Step 4: Copying and updating configuration files..." -ForegroundColor Green
+
+# Create temp directory for modified configs
+$tempConfigDir = Join-Path $env:TEMP "wsl-configs"
+if (Test-Path $tempConfigDir) {
+    Remove-Item -Path $tempConfigDir -Recurse -Force
+}
+New-Item -Path $tempConfigDir -ItemType Directory -Force | Out-Null
+
+# Process and copy WezTerm config if it exists
+$weztermSourcePath = "$RepoPath\windows\.wezterm.lua"
+if (Test-Path $weztermSourcePath) {
+    $weztermDestPath = Join-Path $tempConfigDir ".wezterm.lua"
+    $weztermReplacements = @{
+        'default_domain = "WSL:Arch"' = "default_domain = `"WSL:$DistroName`""
+    }
+    Update-ConfigFile -SourcePath $weztermSourcePath -DestinationPath $weztermDestPath -Replacements $weztermReplacements
+    Copy-Item -Path $weztermDestPath -Destination "$HOME\.wezterm.lua" -Force
+}
+
+# Process and copy all other configuration files from the repository to WSL
+# First copy to temp directory with replacements
+Get-ChildItem -Path "$RepoPath\wsl" -Exclude "etc" -Recurse -File | ForEach-Object {
+    $relativePath = $_.FullName.Substring("$RepoPath\wsl".Length)
+    $destPath = Join-Path $tempConfigDir $relativePath
+    $destDir = Split-Path -Parent $destPath
+    
+    if (-not (Test-Path $destDir)) {
+        New-Item -Path $destDir -ItemType Directory -Force | Out-Null
+    }
+    
+    # Check and replace content if needed based on file type/path
+    $content = Get-Content -Path $_.FullName -Raw -ErrorAction SilentlyContinue
+    $needsReplacement = $false
+    
+    # Check if content contains references to default user or distro name
+    if ($content -match "user" -or $content -match "Arch") {
+        $needsReplacement = $true
+        # Replace username in configuration files
+        $content = $content -replace "\buser\b", $Username
+        # Replace distro name in configuration files
+        $content = $content -replace "\bArch\b", $DistroName
+    }
+    
+    if ($needsReplacement) {
+        Set-Content -Path $destPath -Value $content -Force
+        Write-Host "Updated configuration in: $relativePath" -ForegroundColor Green
+    } else {
+        Copy-Item -Path $_.FullName -Destination $destPath -Force
+    }
+}
+
+# Now copy everything to WSL
+Write-Host "Copying updated configuration files to WSL..." -ForegroundColor Yellow
+Get-ChildItem -Path $tempConfigDir | ForEach-Object {
     Copy-Item -Path $_.FullName -Destination "\\wsl$\$DistroName\home\$Username" -Recurse -Force
 }
 
@@ -98,3 +178,5 @@ wsl --shutdown
 Write-Host "===== Setup Complete! =====" -ForegroundColor Cyan
 Write-Host "You can now launch your WSL instance with: wsl -d $DistroName" -ForegroundColor Green
 Write-Host "Remember to install Tmux plugins by pressing Ctrl+Space, Shift+I when in Tmux" -ForegroundColor Green
+Write-Host "Edit tmux.conf (~/.config/tmux/tmux.conf) to specify which disk will be displayed in the status bar."
+Write-Host "The recommended way to use this WSL setup is through WezTerm. After all configurations are complete, launch WezTerm and you should see tmux running with 3 panes automatically."
