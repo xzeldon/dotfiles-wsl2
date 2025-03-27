@@ -91,7 +91,7 @@ pacman -Syu
 
 # Install dependencies
 pacman -S sudo git vim neovim openssh wget binutils less debugedit fakeroot \
-          fastfetch starship exa fish tmux htop python base-devel go
+          fastfetch starship exa fish tmux htop python base-devel go dos2unix
 ```
 
 </details>
@@ -116,12 +116,20 @@ passwd user
 echo "user ALL=(ALL) ALL" >> /etc/sudoers.d/user
 
 # Configure WSL default user
-# 1. Copy WSL configuration file from host to guest
-# (From Windows PowerShell, assuming you're in the repo directory and Arch is a WSL distribution name, from 2.2)
+
+# On Windows (PowerShell):
+# Assuming:
+# - You're in the repository root directory
+# - Your WSL distribution is named "Arch" (from section 2.2)
+# Copy WSL configuration file from host to guest
 cp .\wsl\etc\wsl.conf \\wsl.localhost\Arch\etc\wsl.conf
 
-# 2. Restart WSL for changes to take effect
-# (Run this in PowerShell on Windows)
+# In WSL (Arch Linux):
+# Convert line endings from Windows (CRLF) to Unix (LF) format
+dos2unix /etc/wsl.conf
+
+# On Windows (PowerShell):
+# Restart WSL to apply changes
 wsl --shutdown
 ```
 
