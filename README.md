@@ -4,6 +4,14 @@ My minimal setup for Arch Linux development environment optimized for WSL2, desi
 
 ###### Mirror on my [<img src="https://git.zeldon.ru/assets/img/logo.svg" align="center" width="25" height="25"/> Git](https://git.zeldon.ru/zeldon/dotfiles-wsl2)
 
+⚠️ If you encounter an issue with slow startup of `docker.service`, the simplest solution is to disable `systemd-networkd-wait-online`:
+
+```bash
+sudo systemctl disable systemd-networkd-wait-online
+```
+
+> See: https://github.com/yuk7/ArchWSL/issues/356
+
 ## Features
 
 <img src="./.meta/screenshots/wall.png" alt="Rice Showcase" align="right" width="580px">
